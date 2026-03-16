@@ -104,7 +104,6 @@ class LoginPage:
             time.sleep(2)  # 给页面一点点缓冲时间
             if self._wait_login_redirect():
                 logger.info(f"用户 {user_label} 登录成功！")
-                save_cookies(self.ctx.driver, self.ctx.config)
                 return True
 
             current_url = self.ctx.driver.current_url

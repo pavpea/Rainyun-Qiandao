@@ -710,14 +710,9 @@ def run_with_config(config: Config) -> bool:
         login_page = LoginPage(ctx, captcha_handler=process_captcha)
         reward_page = RewardPage(ctx, captcha_handler=process_captcha)
 
-        # 尝试使用 cookie 登录
-        logged_in = False
-        if load_cookies(ctx.driver, ctx.config):
-            logged_in = login_page.check_login_status()
-
-        # cookie 无效则进行正常登录
-        if not logged_in:
-            logged_in = login_page.login(user, pwd)
+        # 每次都重新登录，不使用 token/cookie
+        logger.info(f"{prefix}正在发起首次或重新登录请求...")
+        logged_in = login_page.login(user, pwd)
 
         if not logged_in:
             logger.error(f"{prefix}登录失败，任务终止")

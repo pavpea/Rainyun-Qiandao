@@ -5,6 +5,10 @@ FROM python:3.11-slim
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+# 替换为南京大学镜像源加速构建
+RUN sed -i 's/deb.debian.org/mirror.nju.edu.cn/g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || true && \
+    sed -i 's/deb.debian.org/mirror.nju.edu.cn/g' /etc/apt/sources.list 2>/dev/null || true
+
 # 安装 Chromium 和依赖（支持 ARM 和 AMD64）
 RUN apt-get update && apt-get install -y \
     ca-certificates \
@@ -36,9 +40,9 @@ WORKDIR /app
 
 # 复制依赖文件并安装
 COPY requirements.txt .
-# 升级 pip 并安装依赖（修复 metadata 损坏问题）
-RUN pip install --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir --force-reinstall -r requirements.txt
+# 升级 pip 并安装依赖（修复 metadata 损坏问题），使用清华镜像源加速
+RUN pip install --upgrade pip setuptools wheel -i https://pypi.tuna.tsinghua.edu.cn/simple && \
+    pip install --no-cache-dir --force-reinstall -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # 复制应用代码
 COPY rainyun/ ./rainyun/
